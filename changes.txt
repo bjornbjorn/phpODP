@@ -1,0 +1,63 @@
+This text file contain all changes from 1.5 and on :)
+=================================================================
+
+Version 1.5j - 18/05/2006
+=========================
+- $browse variable sanitized even further ;-) .. if browse doesn't start with a / the main page will just load
+
+Version 1.5i - 15/05/2006
+=========================
+- Security fix: sanitized $browse variable (less critical, green)
+
+
+Version 1.5h - 10/05/2006
+=========================
+- Fixed bug that would give a 404 when being served an urlencoded browse variable
+
+Version 1.5f - 25/11/2004
+=========================
+- Fixed bug that caused thumbnail images to not be shown under "Kids and Teens"
+- Fixed XSS vulnerability in go.php (thanks to THBZ in the forum for the notification)
+- Fixed bug that disabled search when $rootcategory was set
+
+
+Version 1.5e - 10/10/2004
+=========================
+- Fixed bug that made the thumbnails not show in root category if rootcategory was set
+- Fixed bug that caused the script to cache empty responses from dmoz.org
+
+
+Version 1.5d - 04/07/2004
+=========================
+- Search in: entire directory / only in <category name> is implemented
+- Enable only browse caching / search caching or both.
+- Focus request on search input field on main page (wee! like Google has!)
+- Adult filter; possibility to block browsing of /Adult/ categories and specific searches (set $adult_filter to true to enable this)
+- Very simple cache maintainance tool (enables you to delete the cache folder via your browser) - delcache.php (must be renamed to work)
+
+Bugfixes:
+---------
+- International characters would be messed up in the portal page go.php
+- Previously phpODP would cache the result from the ODP that stated 'The Open Directory Project is currently under heavy load'.
+  Then it would show that page until the cache expired. This is now fixed.
+
+  
+
+Version 1.5a - 03/04/2004
+==========================
+- Fixed problems with categories that had a ' int their name 
+- Fixed bug with portal page not always working (Thanks to Arno in the forum)
+
+
+
+2004
+|
+    blurry space here
+|
+2001 
+
+
+
+Version 1.0 - 2001
+==================
+- Intial script created
