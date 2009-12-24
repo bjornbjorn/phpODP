@@ -10,7 +10,7 @@ phpODP is a script to put the content of dmoz.org directory on your own homepage
 * Adult filter - dmoz.org contains a lot of adult material (see dmoz.org/Adult). If you do not want this on your site, you can block the /Adult/ categories, in addition to blocking specific search keywords.
 * Custom 404 / Not found pages 
 
-For more information: http://www.bybjorn.com/phpodp
+For more information: [http://www.bybjorn.com/phpodp/](http://www.bybjorn.com/phpodp/)
 
 How to install
 ==============
