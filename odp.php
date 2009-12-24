@@ -341,6 +341,14 @@ if( $browse != "" ) {							// the user is browsing the categories
 			$html = substr( $html, 0, $endpos );
 	
 			$html = str_replace( $linkstr . "/", $linkstr . $replace . "/", $html );
+
+
+/* bug fix by Mark Dickenson 6-12-09
+*  removed carriage return - fixed description displayed outside table
+*/
+
+			$html = str_replace( '<img src="/img/star.gif" width=15 height=16 alt=""> &nbsp; ' . "\n", '<img src="/img/star.gif" width=15 height=16 alt=""> &nbsp; ' , $html ); 
+
 			$html = str_replace( '<img src="' . $odp_image_path, '<img src="' . $your_image_path, $html );		
 
 
@@ -412,7 +420,10 @@ if( $browse != "" ) {							// the user is browsing the categories
 			$html = str_replace( "http://dmoz.org", "$filename?browse=", $html );
 			$html = str_replace( $search_next, $search_next_replace, $html );
 			$html = str_replace(  $filename . '?browse=search?', $filename . '?', $html );
-			$html = str_replace( '<img src="' . $odp_image_path, '<img src="' . $your_image_path, $html );
+			// remove star.gif completely from search results to fix thumbnails not being displayed
+			$html = str_replace( '<img src="/img/star.gif" width=15 height=16 alt="Editor\'s Choice"> &nbsp; ' , '' , $html );
+	
+			$html = str_replace( '</a>' . "\n", '</a>' , $html ); 
 			
 			if($show_thumbnails) {
 			
