@@ -1,6 +1,6 @@
-<?
+﻿<?
 	/*
-	 * Version 1.5j - Copyright Bjørn  Børresen (c) BIE.no 2001-2006
+	 * Version 1.5i - Copyright Bjørn  Børresen (c) BIE.no 2001-2006
 	 * This work is licensed under a Creative Commons License, read more about it here:
 	 * http://creativecommons.org/licenses/by/1.0/
 	 *
@@ -35,12 +35,12 @@
 
 	$show_thumbnails = true;			// set this to true if you want to show thumbnails
 	$browse_cache = true;				// cache user browsing? (will speed up your directory much) - keep this enabled, as it will take a huge load off dmoz's servers.
-	$search_cache = false;				// cache user searches as well? - disk space usage will increase
-	$cache_timeout = 0;					// seconds passed before updating cache .. 60*60*24*7 = 604800 = 7 days before cache is updated ..
+	$search_cache = true;				// cache user searches as well? - disk space usage will increase
+	$cache_timeout = 604800 ;					// seconds passed before updating cache .. 60*60*24*7 = 604800 = 7 days before cache is updated ..
 										// set cache_timeout to 0 if you do not want the cache to be updated ever (or when you delete the files manually)
 										
 	$cache_folder = "cache";			// if you don't want users to be able to browse your cache, change this to something .. strange :)	
-	$use_portal_page = true; 			// set this to true if you want to make all links in your directory to go through go.php
+	$use_portal_page = false; 			// set this to true if you want to make all links in your directory to go through go.php
 	$adult_filter = false;				// block the /Adult/ category and searches listed below? (remember, the open directory contains lots of adult material!)
 	$illegalwords = array("xxx",		// if adult_filter (above) is true, then the search words in this array will be blocked 
 		"porn", 
@@ -58,7 +58,18 @@
 	 *
 	 * Note; some people say they need to change this do http://www.dmoz.org/ to make it work on their php config
 	 */
+
+
+//	$hour = date(H); // code for load balancing for DMOZ mirrors                         
+//	print $hour;	
+
 	$rooturl = "http://www.dmoz.org";
+//	if ( $hour < 12 ){
+// 	$rooturl = "http://ch.dmoz.org";
+//	}
+//	if ( $hour < 2 ){
+// 	$rooturl = "http://de.dmoz.org";
+//	}
 
 	// If you want so use a certain category at the root ..
 	// eg. $rootcategory = "/World/Deutsch/"; to show German pages, or "/World/Franais/" to start in the French category
@@ -74,7 +85,6 @@
 	global $myrooturl,$searchstring,$filename,$donotcache;
 	$filename = $HTTP_SERVER_VARS['PHP_SELF'];
 ?>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <?
 	 $sponsor_file_search = "search_sponsor_header.php";	// default
 	 if($show_search_sponsor == "de") $sponsor_file_search = "search_sponsor_header_de.php";
@@ -91,9 +101,9 @@
 	$searchurl = "http://search.dmoz.org/cgi-bin/search?search=";
 		
 	$startstr = "<table cellspacing";				 // start str to search for on the main page
-	$endstr = "</td></tr></table>";					 // end str to search for on the main page
-	$startbrws = "<hr>"; // start str to search for when browsing
-	$endbrws = '<table width="95%" cellpadding=0';   // end str to search for when browsing
+	$endstr = "</fieldset>";					 // end str to search for on the main page
+	$startbrws = '</ul>'; // start str to search for when browsing
+	$endbrws = '<fieldset class="fieldcap fieldcapRn"';   // end str to search for when browsing
 	//	$startsrch = '<font size="+1"><b>Open Directory Sites';					 // will remove categories from search result
 	$startsrch = '<CENTER>Search:';					 // start str to search for when searching
 	$endsrch = '<TABLE cellpadding=0';				 // end str to search for when searching
@@ -319,7 +329,7 @@ if($adult_filter) {
 			die();
 		}
 	}
-}
+}	
 
 if( $browse != "" ) {							// the user is browsing the categories
 		include("includes/browse_header.php");
@@ -327,7 +337,8 @@ if( $browse != "" ) {							// the user is browsing the categories
         if($show_browse_sponsor != "") include("includes/" . $sponsor_file_browse);
 		
 		$browselink = linkencode($rooturl.$browse);
-		$html = readData($browselink, $browse_cache);		
+		$html = readData($browselink, $browse_cache);
+		
 		if($html != "") {
 
 			$startpos = strpos( $html, "[ <a" );
@@ -342,14 +353,33 @@ if( $browse != "" ) {							// the user is browsing the categories
 	
 			$html = str_replace( $linkstr . "/", $linkstr . $replace . "/", $html );
 
-
-/* bug fix by Mark Dickenson 6-12-09
-*  removed carriage return - fixed description displayed outside table
+/* Major update by Mark Dickenson 22/8/2010 to reflect change to css layout by DMOZ
+*  - changed xhtml tags to html
+*  - must use css style statements in new browse header include file to work properly
 */
-
-			$html = str_replace( '<img src="/img/star.gif" width=15 height=16 alt=""> &nbsp; ' . "\n", '<img src="/img/star.gif" width=15 height=16 alt=""> &nbsp; ' , $html ); 
-
-			$html = str_replace( '<img src="' . $odp_image_path, '<img src="' . $your_image_path, $html );		
+			$html = str_replace( "' href='" , "' href='"."/odp.php?browse=" , $html );
+			$html = str_replace( '[' , '' , $html );
+			$html = str_replace( ']' , '' , $html );
+			$html = str_replace( "<span class='start'></span>" , '' , $html );
+			$html = str_replace( "<span class='links'>" , '<span>' , $html );
+			$html = str_replace( "<span class='pipe'>|</span>" , ' | ' , $html );
+			$html = str_replace( 'Open Directory' , 'Goan Internet Portal' , $html );
+			$html = str_replace( "<img src='/img/dividerN.gif'" , '<hr' , $html );
+			$html = str_replace( '<span><hr style="height:2px;float:left;width:100%" /></span>' , '<hr>' , $html );
+			$html = str_replace( "<div class='alphanumeric'>" , '<center>' , $html );
+			$html = str_replace( "<span class='end'>" , '</center>' , $html );
+			$html = str_replace( '<div class="dir-1 borN">' , '<table width=95% align="center"><tr>' , $html );
+			$html = str_replace( '<ul class="directory dir-col">' , '<td>' , $html );
+			$html = str_replace( '</ul>' , '</td>' , $html );
+			$html = str_replace( '<div class="clear"></div>' , '</tr></table><br>' , $html );
+			$html = str_replace( '<legend>This' , '</ul><legend>This' , $html );
+			$html = str_replace( '<fieldset class="fieldcap">' , '' , $html );
+			$html = str_replace( '<fieldset class="fieldcap fieldcapN">' , '' , $html );
+			$html = str_replace( '</fieldset>' , '</ul></tr></table><br>' , $html );
+			$html = str_replace( '<hr />' , '' , $html );
+			$html = str_replace( '<li class="star">' , '' , $html );
+			$html = str_replace( '<li class="">' , '<li>' , $html );
+			$html = str_replace( '<img src="' . $odp_image_path, '<img src="' . $your_image_path, $html );
 
 
 			if($show_thumbnails) {
@@ -359,7 +389,7 @@ if( $browse != "" ) {							// the user is browsing the categories
 				for($i=0; $i<count($lines); $i++) {
 					$curline = $lines[$i] ;
 		
-					if(eregi("<li><a href=\"(.*)\">(.*)</a>(.*).$", $curline, $info)) {
+					if(eregi("<a href=\"(.*)\">(.*)</a>(.*).$", $curline, $info)) {
 						$url = $info[1];
 						$title = $info[2];
 						$desc = $info[3];
@@ -377,11 +407,9 @@ if( $browse != "" ) {							// the user is browsing the categories
 						}
 											
 						if(strpos($url, $HTTP_SERVER_VARS["PHP_SELF"]) === false) {
-							echo "<table border='0'><tr><td><img src='http://open.thumbshots.org/image.pxf?url=$url' border='0' onload='if (this.width>50) this.border=1'></td><td>"
-							."<li><a href=\"$gourl\">$title</a> - $desc."
-							."</td></tr></table>";
+							echo "</td></tr></table><table width=90% align='center'><tr align='left'><td align='left' width='10%'><a href=\"$gourl\"><img src='http://open.thumbshots.org/image.pxf?url=$url' border='0' onload='if (this.width>50) this.border=1'></td><td align='left' width='50%'><a href=\"$gourl\">$title</a><br>";
 						} else {
-							echo $curline;
+						echo $curline;
 						}						
 						
 					} else {
@@ -420,9 +448,17 @@ if( $browse != "" ) {							// the user is browsing the categories
 			$html = str_replace( "http://dmoz.org", "$filename?browse=", $html );
 			$html = str_replace( $search_next, $search_next_replace, $html );
 			$html = str_replace(  $filename . '?browse=search?', $filename . '?', $html );
-			// remove star.gif completely from search results to fix thumbnails not being displayed
+
+/* bug fix by Mark Dickenson 6-12-09
+* removed star.gif completely from search results to fix thumbnails not being displayed
+*/
+
 			$html = str_replace( '<img src="/img/star.gif" width=15 height=16 alt="Editor\'s Choice"> &nbsp; ' , '' , $html );
 	
+/* bug fix by Mark Dickenson 6-12-09
+*  removed carriage return - fixed pages count appearing outside table
+*/
+
 			$html = str_replace( '</a>' . "\n", '</a>' , $html ); 
 			
 			if($show_thumbnails) {
@@ -451,9 +487,7 @@ if( $browse != "" ) {							// the user is browsing the categories
 						}
 											
 						if(strpos($url, $HTTP_SERVER_VARS["PHP_SELF"]) === false) {
-							echo "<table border='0'><tr><td><img src='http://open.thumbshots.org/image.pxf?url=$url' border='0' onload='if (this.width>50) this.border=1'></td><td>"
-							."<li><a href=\"$gourl\">$title</a> - $desc."
-							."</td></tr></table>";
+							echo "<table border='0'><tr><td><a href=\"$gourl\"><img src='http://open.thumbshots.org/image.pxf?url=$url' border='0' onload='if (this.width>50) this.border=1'></a><td width='1%'></td><td>"."<h4><ul><li style='color:#ff9900'><span style='color:#00FF00'><a href=\"$gourl\">$title</a></h4><ul> $desc"."</td><td width='4%'></td></tr></table>";
 						} else {
 							echo $curline;
 						}						
@@ -481,7 +515,6 @@ if( $browse != "" ) {							// the user is browsing the categories
 
 		$html = str_replace( $linkstr , $linkstr . $replace, $html );
 		$html = str_replace( '<img src="' . $odp_image_path, '<img src="' . $your_image_path, $html );
-
 		echo $html;
 
 		include("includes/main_footer.php");
